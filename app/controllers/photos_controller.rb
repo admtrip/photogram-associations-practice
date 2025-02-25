@@ -1,61 +1,63 @@
 class PhotosController < ApplicationController
   def index
-    @list_of_photos = Photo.all.order(created_at: :desc)
-    render(template: "photos_html/index")
+    @photos = Photo.all
+    render "photos/index"
   end
 
   def show
-    my_photo_id = params.fetch("photo_id")
-    @the_photo = Photo.where(id: my_photo_id).first
-
-    if @the_photo == nil
-      redirect_to("/404")
+    @photo = Photo.find_by(id: params[:photo_id])
+    if @photo
+      render "photos/show"
     else
-      render(template: "photos_html/show")
+      redirect_to "/photos", alert: "Photo not found"
+    end
+  end
+
+  def create
+    @photo = Photo.new
+    @photo.image = params[:photo][:image]
+    @photo.caption = params[:photo][:caption]
+    @photo.owner_id = params[:photo][:owner_id]
+
+    if @photo.save
+      redirect_to "/photos/#{@photo.id}"
+    else
+      redirect_to "/photos", alert: "Failed to create photo"
+    end
+  end
+
+  def update
+    @photo = Photo.find_by(id: params[:photo_id])
+
+    if @photo
+      @photo.update(image: params[:photo][:image], caption: params[:photo][:caption])
+      redirect_to "/photos/#{@photo.id}"
+    else
+      redirect_to "/photos", alert: "Photo not found"
     end
   end
 
   def delete
-    my_photo_id = params.fetch("photo_id")
-    the_photo = Photo.where(id: my_photo_id).first
-    the_photo.destroy
-    # render(template: "photos_html/delete")
-    redirect_to("/photos")
-  end
-
-  def create
-    image = params.fetch("input_image")
-    caption = params.fetch("input_caption")
-    owner_id = params.fetch("input_owner_id")
-    new_photo = Photo.new
-    new_photo.image = image
-    new_photo.caption = caption
-    new_photo.owner_id = owner_id
-    new_photo.save
-    # render(template: "photos_html/delete")
-    redirect_to("/photos/" + new_photo.id.to_s)
-  end
-
-  def update
-    my_photo_id = params.fetch("photo_id")
-    caption = params.fetch("input_caption")
-    image = params.fetch("input_image")
-    the_photo = Photo.where(id: my_photo_id).first
-    the_photo.caption = caption
-    the_photo.image = image
-    the_photo.save
-    redirect_to("/photos/" + my_photo_id)
+    @photo = Photo.find_by(id: params[:photo_id])
+    if @photo
+      @photo.destroy
+      redirect_to "/photos"
+    else
+      redirect_to "/photos", alert: "Photo not found"
+    end
   end
 
   def comment
-    input_photo_id = params.fetch("input_photo_id")
-    input_author_id = params.fetch("input_author_id")
-    input_comment = params.fetch("input_comment")
-    new_comment = Comment.new
-    new_comment.body = input_comment
-    new_comment.author_id = input_author_id
-    new_comment.photo_id = input_photo_id
-    new_comment.save
-    redirect_to("/photos/" + input_photo_id)
-  end
+    @comment = Comment.new
+    @comment.body = params[:comment][:body]
+    @comment.photo_id = params[:photo_id]
+    @comment.author_id = params[:comment][:author_id]
+  
+    if @comment.save
+      redirect_to "/photos/#{@comment.photo_id}", notice: "Comment added successfully!"
+    else
+      redirect_to "/photos/#{params[:photo_id]}", alert: "Failed to add comment"
+    end
+  end 
+  
 end

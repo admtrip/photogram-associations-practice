@@ -1,0 +1,36 @@
+<h1>Photo Gallery</h1>
+
+<table>
+  <tr>
+    <th>Image</th>
+    <th>Caption</th>
+    <th>Posted by</th>
+    <th>Actions</th>
+  </tr>
+
+  <% @photos.each do |photo| %>
+    <tr>
+      <td><img src="<%= photo.image %>" alt="Photo Image" style="max-width: 100px;"></td>
+      <td><%= photo.caption %></td>
+      <td><%= photo.poster.username if photo.poster %></td>
+      <td>
+        <a href="/photos/<%= photo.id %>">View</a> |
+        <a href="/delete_photo/<%= photo.id %>">Delete</a>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h2>Add a New Photo</h2>
+<form action="/insert_photo_record" method="POST">
+  <label for="photo_image">Image</label>
+  <input type="text" id="photo_image" name="photo[image]">
+
+  <label for="photo_caption">Caption</label>
+  <textarea id="photo_caption" name="photo[caption]"></textarea>
+
+  <label for="photo_owner_id">Owner ID</label>
+  <input type="text" id="photo_owner_id" name="photo[owner_id]">
+
+  <button type="submit">Add photo</button>
+</form>

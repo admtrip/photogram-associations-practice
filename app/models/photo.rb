@@ -2,7 +2,7 @@
 #
 # Table name: photos
 #
-#  id             :integer          not null, primary key
+#  id             :bigint           not null, primary key
 #  caption        :text
 #  comments_count :integer
 #  image          :string
@@ -11,9 +11,23 @@
 #  updated_at     :datetime         not null
 #  owner_id       :integer
 #
-
 class Photo < ApplicationRecord
-  validates(:poster, { :presence => true })
+  belongs_to :poster, class_name: "User", foreign_key: "owner_id", optional: true
+  has_many :comments, foreign_key: "photo_id", dependent: :destroy
+  has_many :likes, foreign_key: "photo_id", dependent: :destroy
+  has_many :fans, through: :likes, source: :fan
+end
+
+
+
+
+
+
+
+
+
+
+
 
   # Association accessor methods to define:
   
@@ -28,4 +42,3 @@ class Photo < ApplicationRecord
   ## Indirect associations
 
   # Photo#fans: returns rows from the users table associated to this photo through its likes
-end

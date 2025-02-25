@@ -1,0 +1,14 @@
+<h1>Username: <%= @the_user.username %></h1>
+
+<h2>Update Username</h2>
+<form action="/update_user/<%= @the_user.id %>" method="post">
+  <label for="username">Username</label>
+  <input type="text" id="username" name="username" value="<%= @the_user.username %>" required>
+  <button type="submit">Update user</button>
+</form>
+
+<h2>Photos uploaded by <%= @the_user.username %></h2>
+<% @the_user.own_photos.each do |photo| %>
+  <img src="<%= photo.image %>" width="200">
+  <p><%= photo.caption %></p>
+<% end %>

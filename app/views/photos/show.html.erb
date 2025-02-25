@@ -1,0 +1,45 @@
+<h1>Photo Details</h1>
+
+<p>
+  <strong>Caption:</strong> <%= @photo.caption %>
+</p>
+
+<p>
+  <strong>Image:</strong><br>
+  <img src="<%= @photo.image %>" alt="Photo Image" style="max-width: 500px;">
+</p>
+
+<p>
+  <strong>Posted by:</strong> <%= @photo.poster.username if @photo.poster %>
+</p>
+
+<h2>Comments</h2>
+<ul>
+  <% @photo.comments.each do |comment| %>
+    <li><strong><%= comment.commenter.username if comment.commenter %>:</strong> <%= comment.body %></li>
+  <% end %>
+</ul>
+
+<h2>Add a Comment</h2>
+<form action="/add_comment" method="POST">
+  <label for="comment_body">Comment</label>
+  <textarea name="comment[body]" id="comment_body" required></textarea>
+
+  <input type="hidden" name="photo_id" value="<%= @photo.id %>">
+
+  <label for="author_id">Author ID</label>
+  <input type="text" name="comment[author_id]" id="author_id" required>
+
+  <button type="submit">Add comment</button>
+</form>
+
+<h2>Edit Photo</h2>
+<form action="/update_photo/<%= @photo.id %>" method="POST">
+  <label for="photo_image">Image</label>
+  <input type="text" id="photo_image" name="photo[image]" value="<%= @photo.image %>">
+
+  <label for="photo_caption">Caption</label>
+  <textarea id="photo_caption" name="photo[caption]"><%= @photo.caption %></textarea>
+
+  <button type="submit">Update photo</button>
+</form>

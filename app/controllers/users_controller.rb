@@ -1,34 +1,37 @@
 class UsersController < ApplicationController
   def index
-    @list_of_users = User.all.order(username: :asc)
-    render(template: "users_html/index")
+    @users = User.all
+    render("users/index")
   end
 
   def show
-    @username = params.fetch("username")
-    @the_user = User.where(username: @username).first
+    @the_user = User.find_by(username: params[:username])
 
-    if @the_user == nil
-      redirect_to("/404")
+    if @the_user.nil?
+      redirect_to("/users", alert: "User not found.")
     else
-      render(template: "users_html/show")
+      render("users/show")
     end
   end
 
   def create
-    my_input_username = params.fetch("input_username")
-    new_user = User.new
-    new_user.username = my_input_username
-    new_user.save
-    redirect_to("/users/" + my_input_username)
+    new_user = User.new(username: params[:username])
+
+    if new_user.save
+      redirect_to("/users/#{new_user.username}")
+    else
+      redirect_to("/users", alert: "Failed to create user.")
+    end
   end
 
   def update
-    user_id = params.fetch("user_id")
-    my_input_username = params.fetch("input_username")
-    the_user = User.where(id: user_id).first
-    the_user.username = my_input_username
-    the_user.save
-    redirect_to("/users/" + my_input_username)
+    @the_user = User.find_by(id: params[:user_id])
+
+    if @the_user
+      @the_user.update(username: params[:username])
+      redirect_to("/users/#{@the_user.username}")
+    else
+      redirect_to("/users", alert: "User not found.")
+    end
   end
 end

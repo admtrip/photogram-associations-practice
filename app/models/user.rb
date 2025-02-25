@@ -2,7 +2,7 @@
 #
 # Table name: users
 #
-#  id             :integer          not null, primary key
+#  id             :bigint           not null, primary key
 #  comments_count :integer
 #  likes_count    :integer
 #  private        :boolean
@@ -10,12 +10,29 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #
-
 class User < ApplicationRecord
-  validates(:username, {
-    :presence => true,
-    :uniqueness => { :case_sensitive => false },
-  })
+  validates :username, presence: true, uniqueness: { case_sensitive: false }
+
+  # Direct Associations
+  has_many :comments, foreign_key: "author_id", dependent: :destroy
+  has_many :own_photos, class_name: "Photo", foreign_key: "owner_id", dependent: :destroy
+  has_many :likes, foreign_key: "fan_id", dependent: :destroy
+  has_many :sent_follow_requests, class_name: "FollowRequest", foreign_key: "sender_id", dependent: :destroy
+  has_many :received_follow_requests, class_name: "FollowRequest", foreign_key: "recipient_id", dependent: :destroy
+
+  # Indirect Associations
+  has_many :liked_photos, through: :likes, source: :photo
+  has_many :commented_photos, through: :comments, source: :photo
+end
+
+
+
+
+
+
+
+
+
 
   # Association accessor methods to define:
   
@@ -55,4 +72,3 @@ class User < ApplicationRecord
   # User#feed: returns rows from the photos table associated to this user through its leaders (the leaders' own_photos)
 
   # User#discover: returns rows from the photos table associated to this user through its leaders (the leaders' liked_photos)
-end
